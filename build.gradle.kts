@@ -211,6 +211,10 @@ dependencies {
 
     implementation(kotlin("stdlib-jdk8"))
     testImplementation("junit", "junit", "4.12")
+
+    implementation("net.compartmental.code:minim:2.2.2") {
+        exclude(group = "org.apache.maven.plugins", module = "maven-javadoc-plugin")
+    }
 }
 
 // --------------------------------------------------------------------------------------------------------------------
