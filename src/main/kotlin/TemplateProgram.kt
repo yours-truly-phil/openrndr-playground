@@ -6,12 +6,12 @@ import org.openrndr.draw.loadFont
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
-import kotlin.math.abs
+import kotlin.math.*
 
 fun main() = application {
     configure {
-        width = 1920
-        height = 1080
+        width = 1280
+        height = 768
     }
 
     program {
@@ -21,7 +21,7 @@ fun main() = application {
             fun createInput(fileName: String): InputStream = FileInputStream(File(fileName))
         })
         minim.debugOn()
-        val lineIn = minim.lineIn
+        val lineIn = minim.getLineIn(Minim.MONO)
         val fft = FFT(lineIn.bufferSize(), lineIn.sampleRate())
 
         extend {
@@ -33,12 +33,16 @@ fun main() = application {
             for (i in 0 until 4) bass += fft.getBand(i)
             var tre = 0.0
             for (i in 20 until 60) tre += fft.getBand(i)
-            drawer.clear(ColorRGBa(bass / 75.0 + tre / 500.0, bass / 150.0, tre / 1000.0))
+            drawer.clear(
+                ColorRGBa(
+                    (bass / 25.0 + tre / 125.0) * (sin(seconds) + 1) / 2.0,
+                    (bass / 50.0) * (sin(seconds + PI) + 1) / 2.0,
+                    (tre / 250.0) * (cos(seconds) + 1) / 2.0
+                )
+            )
+
             drawer.fontMap = font
             drawer.fill = ColorRGBa.BLACK
-            drawer.text("max: $max", 10.0, height / 2.0)
-            drawer.text("fft: ${fft.getBand(0)}", 10.0, height / 2.0 + 20)
-            drawer.text("bass: $bass", width - 300.0, 100.0)
 
             drawer.fill = ColorRGBa.WHITE
             drawer.stroke = ColorRGBa.BLUE

@@ -5,7 +5,7 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 /* the name of this project, default is the template version but you are free to change these */
 group = "org.openrndr.template"
-version = "0.3.14"
+version = "0.3.44"
 
 val applicationMainClass = "TemplateProgramKt"
 
@@ -29,8 +29,8 @@ val orxFeatures = setOf(
 //  "orx-interval-tree",
 //  "orx-jumpflood",
 //  "orx-kdtree",
-//  "orx-mesh-generators",
-//  "orx-midi",
+    "orx-mesh-generators",
+    "orx-midi",
 //  "orx-no-clear",
     "orx-noise",
 //  "orx-obj-loader",
@@ -48,7 +48,7 @@ val orxFeatures = setOf(
 //  "orx-time-operators",
 //  "orx-kinect-v1",
 //  "orx-tensorflow",
-    
+
     "orx-panel"
 )
 
@@ -87,7 +87,7 @@ val orxTensorflowBackend = "orx-tensorflow-mkl"
 val supportedPlatforms = setOf("windows", "macos", "linux-x64", "linux-arm64")
 
 val openrndrOs = if (project.hasProperty("targetPlatform")) {
-    val platform : String = project.property("targetPlatform") as String
+    val platform: String = project.property("targetPlatform") as String
     if (platform !in supportedPlatforms) {
         throw IllegalArgumentException("target platform not supported: $platform")
     } else {
@@ -96,10 +96,10 @@ val openrndrOs = if (project.hasProperty("targetPlatform")) {
 } else when (OperatingSystem.current()) {
     OperatingSystem.WINDOWS -> "windows"
     OperatingSystem.MAC_OS -> "macos"
-    OperatingSystem.LINUX -> when(val h = DefaultNativePlatform("current").architecture.name) {
+    OperatingSystem.LINUX -> when (val h = DefaultNativePlatform("current").architecture.name) {
         "x86-64" -> "linux-x64"
         "aarch64" -> "linux-arm64"
-        else ->throw IllegalArgumentException("architecture not supported: $h")
+        else -> throw IllegalArgumentException("architecture not supported: $h")
     }
     else -> throw IllegalArgumentException("os not supported")
 }
@@ -114,17 +114,18 @@ enum class Logging {
 /*  What type of logging should this project use? */
 val applicationLogging = Logging.FULL
 
-val kotlinVersion = "1.4.0"
+val kotlinVersion = "1.4.31"
 
 plugins {
     java
-    kotlin("jvm") version("1.4.0")
+    kotlin("jvm") version ("1.4.0")
     id("com.github.johnrengelman.shadow") version ("6.1.0")
     id("org.beryx.runtime") version ("1.11.4")
 }
 
 repositories {
     mavenCentral()
+    jcenter()
     if (openrndrUseSnapshot || orxUseSnapshot) {
         mavenLocal()
     }
@@ -132,7 +133,7 @@ repositories {
 }
 
 fun DependencyHandler.orx(module: String): Any {
-        return "org.openrndr.extra:$module:$orxVersion"
+    return "org.openrndr.extra:$module:$orxVersion"
 }
 
 fun DependencyHandler.orml(module: String): Any {
@@ -167,15 +168,15 @@ dependencies {
     implementation(openrndr("extensions"))
     implementation(openrndr("filter"))
 
-    implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core","1.3.9")
-    implementation("io.github.microutils", "kotlin-logging","1.12.0")
+    implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.3.9")
+    implementation("io.github.microutils", "kotlin-logging", "1.12.0")
 
-    when(applicationLogging) {
+    when (applicationLogging) {
         Logging.NONE -> {
-            runtimeOnly("org.slf4j","slf4j-nop","1.7.30")
+            runtimeOnly("org.slf4j", "slf4j-nop", "1.7.30")
         }
         Logging.SIMPLE -> {
-            runtimeOnly("org.slf4j","slf4j-simple","1.7.30")
+            runtimeOnly("org.slf4j", "slf4j-simple", "1.7.30")
         }
         Logging.FULL -> {
             runtimeOnly("org.apache.logging.log4j", "log4j-slf4j-impl", "2.13.3")
@@ -192,7 +193,7 @@ dependencies {
     for (feature in orxFeatures) {
         implementation(orx(feature))
     }
-    
+
     for (feature in ormlFeatures) {
         implementation(orml(feature))
     }
@@ -215,6 +216,8 @@ dependencies {
     implementation("net.compartmental.code:minim:2.2.2") {
         exclude(group = "org.apache.maven.plugins", module = "maven-javadoc-plugin")
     }
+
+    implementation("khttp:khttp:1.0.0")
 }
 
 // --------------------------------------------------------------------------------------------------------------------
